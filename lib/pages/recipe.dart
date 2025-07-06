@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:recipe_app/widget/support_widget.dart';
 class Recipe extends StatefulWidget {
-  const Recipe({super.key});
+  String image, foodname, recipe;
+  Recipe({required this.image, required this.foodname,required this.recipe});
 
   @override
   State<Recipe> createState() => _RecipeState();
@@ -14,8 +15,8 @@ class _RecipeState extends State<Recipe> {
       body: Container(
         child: Stack(
           children: [
-            Image.asset(
-              "images/beefsteak.jpg",
+            Image.network(
+              widget.image!,
               width: MediaQuery.of(context).size.width,
               height: 400,
               fit: BoxFit.cover,
@@ -29,12 +30,12 @@ class _RecipeState extends State<Recipe> {
               child: Column(
                 crossAxisAlignment:CrossAxisAlignment.start,
                 children: [
-                  Text("Medium Rare BeefSteak",style: TextStyle(fontSize: 30.0,fontWeight: FontWeight.bold),),
+                  Text(widget.foodname,style: TextStyle(fontSize: 30.0,fontWeight: FontWeight.bold),),
                   Divider(),
                   SizedBox(height: 10.0,),
                   Text("About Recipes",style: AppWidget.boldfeildtextstyle(),),
                   SizedBox(height: 10.0,),
-                  Text("1 dong cong thuc",style: AppWidget.boldfeildtextstyle(),),
+                  Text(widget.recipe,style: AppWidget.boldfeildtextstyle(),),
                 ],
               ),
             ),

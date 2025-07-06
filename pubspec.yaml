@@ -39,6 +39,7 @@ dependencies:
   firebase_storage:
   image_picker:
   random_string:
+  fluttertoast:
 
 
 
