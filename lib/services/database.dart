@@ -18,4 +18,11 @@ class DatabaseMethods{
   Future <DocumentSnapshot>getUserInfo(String uid)async{
     return await FirebaseFirestore.instance.collection("Users").doc(uid).get();
   }
+    Future<void> addUserProfileInfo(String uid, Map<String, dynamic> userProfile) async {
+    return await FirebaseFirestore.instance.collection("User_information").doc(uid).set(userProfile);
+  }
+
+  Future<DocumentSnapshot> getUserProfileInfo(String uid) async {
+    return await FirebaseFirestore.instance.collection("User_information").doc(uid).get();
+  }
 }
