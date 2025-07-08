@@ -12,4 +12,10 @@ class DatabaseMethods{
   Future<QuerySnapshot> Search(String name)async{
     return await FirebaseFirestore.instance.collection("Recipe").where("Key",isEqualTo: name.substring(0,1).toUpperCase()).get();
   }
+  Future <void> addUserInfo(String uid,Map<String, dynamic>userInfo)async{
+    return await FirebaseFirestore.instance.collection("Users").doc(uid).set(userInfo);
+  }
+  Future <DocumentSnapshot>getUserInfo(String uid)async{
+    return await FirebaseFirestore.instance.collection("Users").doc(uid).get();
+  }
 }

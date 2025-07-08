@@ -1,5 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'home_screen.dart';
+import 'home.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:recipe_app/services/database.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -47,7 +50,7 @@ class _LoginScreenState extends State<LoginScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Image.asset("images/Logo.jpg"),
+          Image.asset("images/logo.jpg"),
           const SizedBox(height: 20),
           Center(
             child: const Text(
@@ -127,7 +130,7 @@ class _LoginScreenState extends State<LoginScreen> {
             height: 50,
             child: ElevatedButton(
               style: _buttonStyle(),
-              onPressed: () {
+              onPressed: () async {
                 // TODO: Xử lý đăng nhập
                 String email = emailController.text.trim();
                 String password = passwordController.text;
@@ -136,12 +139,16 @@ class _LoginScreenState extends State<LoginScreen> {
                   _showDialog("Email hoặc mật khẩu không hợp lệ!");
                   return;
                 }
-
-                // Giả lập đăng nhập thành công → chuyển đến HomeScreen
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => const Home()),
-                );
+                try {
+                  UserCredential userCredential = await FirebaseAuth.instance
+                      .signInWithEmailAndPassword(email: email, password: password);
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => const Home()),
+                  );
+                } catch (e) {
+                  _showDialog("Đăng nhập thất bại: ${e.toString()}");
+                }
               },
               child: const Text('Đăng nhập', style: TextStyle(fontWeight: FontWeight.bold,color: Colors.white)),
             ),
@@ -208,9 +215,8 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  // ------------------- VALIDATION LOGIC ---------------------
 
-  void _handleRegister() {
+  void _handleRegister()async {
     String email = emailController.text.trim();
     String pass = passwordController.text;
     String confirm = confirmPasswordController.text;
@@ -229,13 +235,23 @@ class _LoginScreenState extends State<LoginScreen> {
       _showDialog("Mật khẩu xác nhận không trùng khớp.");
       return;
     }
-
-    // Nếu mọi thứ hợp lệ
-    _showDialog("Đăng ký thành công!", onOk: () {
-      setState(() {
-        currentPage = 1; // chuyển về trang đăng nhập
+    try {
+      UserCredential userCredential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(email: email, password: pass);
+      await DatabaseMethods().addUserInfo(userCredential.user!.uid, {
+        'uid': userCredential.user!.uid,
+        'email': email,
+        'createdAt': DateTime.now(),
       });
-    });
+
+      _showDialog("Đăng ký thành công!", onOk: () {
+        setState(() {
+          currentPage = 1; // Quay lại màn hình đăng nhập
+        });
+      });
+    } catch (e) {
+      _showDialog("Đăng ký thất bại: ${e.toString()}");
+    }
   }
 
   bool isValidEmail(String email) {
