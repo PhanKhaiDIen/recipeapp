@@ -25,4 +25,11 @@ class DatabaseMethods{
   Future<DocumentSnapshot> getUserProfileInfo(String uid) async {
     return await FirebaseFirestore.instance.collection("User_information").doc(uid).get();
   }
+  Future<String?> getAvatarUrl(String uid) async {
+    final doc = await FirebaseFirestore.instance.collection("User_information").doc(uid).get();
+    if (doc.exists) {
+      return doc.data()?['avatarUrl'];
+    }
+    return null;
+  }
 }
