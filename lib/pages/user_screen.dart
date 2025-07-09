@@ -4,7 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-
 import 'Login_screen.dart';
 
 class UserScreen extends StatefulWidget {
@@ -16,7 +15,6 @@ class UserScreen extends StatefulWidget {
 
 class _UserScreenState extends State<UserScreen> {
   String name = "", birth = "", phone = "", email = "", address = "";
-  File? avatarFile;
   String? avatarUrl;
 
   @override
@@ -58,42 +56,12 @@ class _UserScreenState extends State<UserScreen> {
           phone: phone,
           email: email,
           address: address,
+          avatarUrl: avatarUrl,
         ),
       ),
     );
-    loadUserData(); // reload sau khi chỉnh sửa
+    loadUserData();
   }
-
-  Future<void> pickAvatar() async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      File imageFile = File(pickedFile.path);
-      setState(() {
-        avatarFile = imageFile;
-      });
-
-      final uid = FirebaseAuth.instance.currentUser?.uid;
-      if (uid != null) {
-        // Upload lên Firebase Storage
-        final storageRef = FirebaseStorage.instance.ref().child("avatars/$uid.jpg");
-        await storageRef.putFile(avatarFile!);
-        String downloadUrl = await storageRef.getDownloadURL();
-
-
-        // Lấy URL ảnh
-        final imageUrl = await storageRef.getDownloadURL();
-
-        // Lưu vào Firestore
-        await FirebaseFirestore.instance.collection('User_information').doc(uid).update({
-          'avatarUrl': imageUrl,
-        });
-
-        print("Avatar updated: $imageUrl");
-      }
-    }
-  }
-
 
   Widget buildInfoItem(String label, String value) {
     return Padding(
@@ -116,11 +84,12 @@ class _UserScreenState extends State<UserScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Hồ Sơ Người Dùng")),
+      appBar: AppBar(title: const Text("Hồ Sơ Người Dùng"), centerTitle: true),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
+            const SizedBox(height: 15),
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -129,18 +98,11 @@ class _UserScreenState extends State<UserScreen> {
               ),
               child: Row(
                 children: [
-                  GestureDetector(
-                    onTap: pickAvatar,
-                    child: CircleAvatar(
-                      radius: 60,
-                      backgroundColor: Colors.grey[300],
-                      backgroundImage: avatarFile != null
-                          ? FileImage(avatarFile!)
-                          : (avatarUrl != null ? NetworkImage(avatarUrl!) : null) as ImageProvider?,
-                      child: (avatarFile == null && avatarUrl == null)
-                          ? const Icon(Icons.add_a_photo, size: 40, color: Colors.black)
-                          : null,
-                    ),
+                  CircleAvatar(
+                    radius: 60,
+                    backgroundColor: Colors.grey[300],
+                    backgroundImage: avatarUrl != null ? NetworkImage(avatarUrl!) : null,
+                    child: avatarUrl == null ? const Icon(Icons.add_a_photo, size: 30, color: Colors.black) : null,
                   ),
                   const SizedBox(width: 16),
                   Expanded(
@@ -158,10 +120,13 @@ class _UserScreenState extends State<UserScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 10),
             buildMenuItem("Thông tin cá nhân", navigateToEdit),
+            const SizedBox(height: 10),
             buildMenuItem("Công thức yêu thích", () {}),
+            const SizedBox(height: 10),
             buildMenuItem("Câu hỏi thường gặp", () {}),
+            const SizedBox(height: 10),
             buildMenuItem("Quyên góp từ thiện", () {}),
             const Spacer(),
             ElevatedButton(
@@ -169,9 +134,9 @@ class _UserScreenState extends State<UserScreen> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.black,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                minimumSize: const Size.fromHeight(50),
+                minimumSize: const Size.fromHeight(60),
               ),
-              child: const Text("Log Out", style: TextStyle(color: Colors.white)),
+              child: const Text("Log Out", style: TextStyle(color: Colors.white, fontSize: 20)),
             ),
           ],
         ),
@@ -180,9 +145,11 @@ class _UserScreenState extends State<UserScreen> {
   }
 }
 
+// ---------------------- Edit Profile --------------------------
 
 class EditProfileScreen extends StatefulWidget {
   final String name, birth, phone, email, address;
+  final String? avatarUrl;
 
   const EditProfileScreen({
     super.key,
@@ -191,6 +158,7 @@ class EditProfileScreen extends StatefulWidget {
     required this.phone,
     required this.email,
     required this.address,
+    this.avatarUrl,
   });
 
   @override
@@ -199,6 +167,9 @@ class EditProfileScreen extends StatefulWidget {
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
   final _formKey = GlobalKey<FormState>();
+  File? _pickedImage;
+  String? imageUrl;
+
   late TextEditingController nameController,
       birthController,
       phoneController,
@@ -213,51 +184,141 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     phoneController = TextEditingController(text: widget.phone);
     emailController = TextEditingController(text: widget.email);
     addressController = TextEditingController(text: widget.address);
+    imageUrl = widget.avatarUrl;
+  }
+
+  Future<void> pickImage() async {
+    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      final image = File(pickedFile.path);
+      setState(() {
+        _pickedImage = image;
+      });
+
+      final url = await uploadAvatar(image);
+      if (url != null) {
+        setState(() {
+          imageUrl = url;
+        });
+      }
+    }
+  }
+
+  Future<String?> uploadAvatar(File imageFile) async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid != null) {
+      final ref = FirebaseStorage.instance.ref().child("avatars/$uid.jpg");
+      await ref.putFile(imageFile);
+      final url = await ref.getDownloadURL();
+      return url;
+    }
+    return null;
   }
 
   Future<void> updateUserData() async {
     var uid = FirebaseAuth.instance.currentUser?.uid;
-    if (uid != null) {
-      await FirebaseFirestore.instance.collection('User_information').doc(uid).set({
-        'name': nameController.text,
-        'birth': birthController.text,
-        'phone': phoneController.text,
-        'email': emailController.text,
-        'address': addressController.text,
-      });
-      Navigator.pop(context);
+    if (uid == null) return;
+
+    Map<String, dynamic> updatedData = {
+      'name': nameController.text,
+      'birth': birthController.text,
+      'phone': phoneController.text,
+      'email': emailController.text,
+      'address': addressController.text,
+    };
+
+    if (imageUrl != null) {
+      updatedData['avatarUrl'] = imageUrl;
     }
+
+    await FirebaseFirestore.instance
+        .collection('User_information')
+        .doc(uid)
+        .set(updatedData);
+
+    Navigator.pop(context);
   }
 
   Widget buildTextField(String label, TextEditingController controller) {
-    return TextFormField(
-      controller: controller,
-      decoration: InputDecoration(labelText: label),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: TextFormField(
+        controller: controller,
+        decoration: InputDecoration(
+          labelText: label,
+          filled: true,
+          fillColor: Colors.grey[200],
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Thông tin cá nhân")),
+      appBar: AppBar(
+        title: const Text("Thông tin cá nhân"),
+        centerTitle: true,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16),
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            children: [
-              buildTextField("Họ và tên", nameController),
-              buildTextField("Ngày sinh", birthController),
-              buildTextField("Số điện thoại", phoneController),
-              buildTextField("Email", emailController),
-              buildTextField("Địa chỉ", addressController),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: updateUserData,
-                child: const Text("Cập nhật thông tin"),
+        child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    GestureDetector(
+                      onTap: pickImage,
+                      child: CircleAvatar(
+                        radius: 70,
+                        backgroundColor: Colors.grey[200],
+                        backgroundImage: _pickedImage != null
+                            ? FileImage(_pickedImage!)
+                            : (imageUrl != null ? NetworkImage(imageUrl!) : null) as ImageProvider?,
+                        child: _pickedImage == null && imageUrl == null
+                            ? const Icon(Icons.camera_alt_outlined, size: 30, color: Colors.black)
+                            : null,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Form(
+                      key: _formKey,
+                      child: Column(
+                        children: [
+                          buildTextField("Họ và tên", nameController),
+                          const SizedBox(height: 10),
+                          buildTextField("Ngày tháng năm sinh", birthController),
+                          const SizedBox(height: 10),
+                          buildTextField("Số điện thoại", phoneController),
+                          const SizedBox(height: 10),
+                          buildTextField("Email người dùng", emailController),
+                          const SizedBox(height: 10),
+                          buildTextField("Địa chỉ nhà", addressController),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ],
-          ),
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton(
+                onPressed: updateUserData,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.black,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+                child: const Text("Cập nhật thông tin", style: TextStyle(fontSize: 16, color: Colors.white)),
+              ),
+            ),
+          ],
         ),
       ),
     );
