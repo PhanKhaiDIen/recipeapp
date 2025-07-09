@@ -17,7 +17,7 @@ class AddRecipe extends StatefulWidget {
 
 class _AddRecipeState extends State<AddRecipe> {
   String? value;
-  final List<String> recipe=['Com Tam Recipes','Pho Recipes','Bun Bo Recipes','Banh Xeo Recipes'];
+  final List<String> recipe=['Main Dishes Recipes','Dessert Recipes','Noodles & Soup Recipes','Vegetables Recipes','Drinks Recipes'];
   File? selectedImage;
   TextEditingController namecontroller=new TextEditingController();
   TextEditingController detailcontroller=new TextEditingController();
