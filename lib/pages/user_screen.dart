@@ -145,7 +145,6 @@ class _UserScreenState extends State<UserScreen> {
   }
 }
 
-// ---------------------- Edit Profile --------------------------
 
 class EditProfileScreen extends StatefulWidget {
   final String name, birth, phone, email, address;
