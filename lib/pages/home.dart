@@ -137,14 +137,19 @@ Widget allRecipe(){
                     ),
                   ),
                   Spacer(),
-                  ClipRRect(
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (_) => UserScreen()));
+                    },
+                    child: ClipRRect(
                       borderRadius: BorderRadius.circular(10),
-                      child:Image.asset(
-                          "images/obito.jpg",
-                          height: 70,
-                          width: 70,
-                          fit: BoxFit.cover
-                      )
+                      child: Image.asset(
+                        "images/obito.jpg",
+                        height: 70,
+                        width: 70,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
                   )
                 ],
               ),
