@@ -185,7 +185,7 @@ Widget allRecipe(){
                       children: [
                         GestureDetector(
                           onTap: (){
-                            Navigator.push(context,MaterialPageRoute(builder: (context)=> CategoryRecipe(category: "Com Tam Recipes")));
+                            Navigator.push(context,MaterialPageRoute(builder: (context)=> CategoryRecipe(category: "Main Dishes Recipes")));
                           },
                           child: Container(
                             margin: EdgeInsets.only(right: 20.0),
@@ -194,14 +194,14 @@ Widget allRecipe(){
                                 ClipRRect(
                                   borderRadius:BorderRadius.circular(10),
                                   child: Image.asset(
-                                    "images/comtam.jpg",
+                                    "images/MainDishes.jpg",
                                     height: 150,
                                     width: 150,
                                     fit: BoxFit.cover,
                                   ),
                                 ),
                                 SizedBox(height: 10.0,),
-                                Text("Com Tam Recipes",
+                                Text("Main DishesDishes Recipes",
                                     style: AppWidget.lightfeildtextstyle()
                                 )
                               ],
@@ -210,7 +210,7 @@ Widget allRecipe(){
                         ),
                         GestureDetector(
                           onTap: (){
-                            Navigator.push(context,MaterialPageRoute(builder: (context)=> CategoryRecipe(category: "Pho Recipes")));
+                            Navigator.push(context,MaterialPageRoute(builder: (context)=> CategoryRecipe(category: "Dessert Recipes")));
                           },
                           child: Container(
                             margin: EdgeInsets.only(right: 20.0),
@@ -219,64 +219,95 @@ Widget allRecipe(){
                                 ClipRRect(
                                   borderRadius:BorderRadius.circular(10),
                                   child: Image.asset(
-                                    "images/pho.jpg",
+                                    "images/Dessert.jpg",
                                     height: 150,
                                     width: 150,
                                     fit: BoxFit.cover,
                                   ),
                                 ),
                                 SizedBox(height: 10.0,),
-                                Text("Pho Recipes",
+                                Text("Dessert Recipes",
                                     style: AppWidget.lightfeildtextstyle()
                                 )
                               ],
                             ),
                           ),
                         ),
-                        Container(
-                          margin: EdgeInsets.only(right: 20.0),
-                          child: Column(
-                            children: [
-                              ClipRRect(
-                                borderRadius:BorderRadius.circular(10),
-                                child: Image.asset(
-                                  "images/bunbo.jpg",
-                                  height: 150,
-                                  width: 150,
-                                  fit: BoxFit.cover,
+                       GestureDetector(
+                          onTap: (){
+                            Navigator.push(context,MaterialPageRoute(builder: (context)=> CategoryRecipe(category: "Noodles & Soup Recipes")));
+                          },
+                          child: Container(
+                            margin: EdgeInsets.only(right: 20.0),
+                            child: Column(
+                              children: [
+                                ClipRRect(
+                                  borderRadius:BorderRadius.circular(10),
+                                  child: Image.asset(
+                                    "images/Soup.jpg",
+                                    height: 150,
+                                    width: 150,
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
-                              ),
-                              SizedBox(height: 10.0,),
-                              Text("Bun Bo Recipes",
-                                  style: AppWidget.lightfeildtextstyle()
-                              )
-                            ],
+                                SizedBox(height: 10.0,),
+                                Text("Noodles & Soup Recipes",
+                                    style: AppWidget.lightfeildtextstyle()
+                                )
+                              ],
+                            ),
                           ),
                         ),
-                        Container(
-                          margin: EdgeInsets.only(right: 20.0),
-                          child: Column(
-                            children: [
-                              ClipRRect(
-                                borderRadius:BorderRadius.circular(10),
-                                child: Image.asset(
-                                  "images/banhxeo.jpg",
-                                  height: 150,
-                                  width: 150,
-                                  fit: BoxFit.cover,
+                        GestureDetector(
+                          onTap: (){
+                            Navigator.push(context,MaterialPageRoute(builder: (context)=> CategoryRecipe(category: "Vegetables Recipes")));
+                          },
+                          child: Container(
+                            margin: EdgeInsets.only(right: 20.0),
+                            child: Column(
+                              children: [
+                                ClipRRect(
+                                  borderRadius:BorderRadius.circular(10),
+                                  child: Image.asset(
+                                    "images/Vegetable.jpg",
+                                    height: 150,
+                                    width: 150,
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
-                              ),
-                              SizedBox(height: 10.0,),
-                              Text("Banh Xeo Recipes",
-                                  style: AppWidget.lightfeildtextstyle()
-                              )
-                            ],
+                                SizedBox(height: 10.0,),
+                                Text("Vegetables Recipes",
+                                    style: AppWidget.lightfeildtextstyle()
+                                )
+                              ],
+                            ),
                           ),
                         ),
-                      ],
-                    ),
-                  ),
-                ),
+                        GestureDetector(
+                          onTap: (){
+                            Navigator.push(context,MaterialPageRoute(builder: (context)=> CategoryRecipe(category: "Drinks Recipes")));
+                          },
+                          child: Container(
+                            margin: EdgeInsets.only(right: 20.0),
+                            child: Column(
+                              children: [
+                                ClipRRect(
+                                  borderRadius:BorderRadius.circular(10),
+                                  child: Image.asset(
+                                    "images/Drinks.jpg",
+                                    height: 150,
+                                    width: 150,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                                SizedBox(height: 10.0,),
+                                Text("Drinks Recipes",
+                                    style: AppWidget.lightfeildtextstyle()
+                                )
+                              ],
+                            ),
+                          ),
+                        ),
                 SizedBox(height: 20.0,
                 ),
             search? Container(): Expanded(child: allRecipe()),
