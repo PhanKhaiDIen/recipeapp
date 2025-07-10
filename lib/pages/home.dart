@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:recipe_app/pages/add_recipe.dart';
 import 'package:recipe_app/pages/category.dart';
-import 'package:recipe_app/pages/recipe_screen.dart';
+import 'package:recipe_app/pages/recipe.dart';
 import 'package:recipe_app/services/database.dart';
 import 'package:recipe_app/widget/support_widget.dart';
 import 'package:recipe_app/pages/user_screen.dart';
@@ -153,14 +153,18 @@ class _HomeState extends State<Home> {
                     onTap: () {
                       Navigator.push(context, MaterialPageRoute(builder: (_) => UserScreen()));
                     },
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: Image.asset(
-                        "images/obito.jpg",
-                        height: 70,
-                        width: 70,
-                        fit: BoxFit.cover,
-                      ),
+                    child: avatarUrl != null
+                        ? Image.network(
+                      avatarUrl!,
+                      height: 70,
+                      width: 70,
+                      fit: BoxFit.cover,
+                    )
+                        : Image.asset(
+                      "images/obito.jpg",
+                      height: 70,
+                      width: 70,
+                      fit: BoxFit.cover,
                     ),
                   )
                 ],
