@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 class DatabaseMethods{
   Future Addrecipe(Map<String, dynamic> addrecipe) async {
     return await FirebaseFirestore.instance.collection("Recipe").add(addrecipe);
@@ -31,5 +32,46 @@ class DatabaseMethods{
       return doc.data()?['avatarUrl'];
     }
     return null;
+  }
+  Future<void> addToFavorites({required String foodName, required String image, required String recipe,}) async {
+    final uid = FirebaseAuth.instance.currentUser!.uid;
+    return await FirebaseFirestore.instance.collection("Users").doc(uid).collection("Favorites").doc(foodName)
+        .set({
+      'foodname': foodName,
+      'image': image,
+      'recipe': recipe,
+      'timestamp': FieldValue.serverTimestamp(),
+    });
+  }
+  Future<bool> isFavorite(String foodName) async {
+    final uid = FirebaseAuth.instance.currentUser!.uid;
+
+    final doc = await FirebaseFirestore.instance
+        .collection("Users")
+        .doc(uid)
+        .collection("Favorites")
+        .doc(foodName)
+        .get();
+
+    return doc.exists;
+  }
+  Future<Stream<QuerySnapshot>> getFavorites() async {
+    final uid = FirebaseAuth.instance.currentUser!.uid;
+
+    return FirebaseFirestore.instance
+        .collection("Users")
+        .doc(uid)
+        .collection("Favorites")
+        .orderBy('timestamp', descending: true)
+        .snapshots();
+  }
+  Future<void> removeFromFavorites(String foodName) async {
+    final uid = FirebaseAuth.instance.currentUser!.uid;
+    return await FirebaseFirestore.instance
+        .collection("Users")
+        .doc(uid)
+        .collection("Favorites")
+        .doc(foodName)
+        .delete();
   }
 }

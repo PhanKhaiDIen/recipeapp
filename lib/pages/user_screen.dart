@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:recipe_app/pages/favorite.dart';
 import 'Login_screen.dart';
 
 class UserScreen extends StatefulWidget {
@@ -123,7 +124,12 @@ class _UserScreenState extends State<UserScreen> {
             const SizedBox(height: 10),
             buildMenuItem("Thông tin cá nhân", navigateToEdit),
             const SizedBox(height: 10),
-            buildMenuItem("Công thức yêu thích", () {}),
+            buildMenuItem("Công thức yêu thích", () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => FavoritePage()),
+              );
+            }),
             const SizedBox(height: 10),
             buildMenuItem("Câu hỏi thường gặp", () {}),
             const SizedBox(height: 10),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:recipe_app/services/database.dart';
 import 'package:recipe_app/widget/support_widget.dart';
 class Recipe extends StatefulWidget {
   String image, foodname, recipe;
@@ -9,6 +10,33 @@ class Recipe extends StatefulWidget {
 }
 
 class _RecipeState extends State<Recipe> {
+  bool isFavorite=false;
+  final DatabaseMethods db=DatabaseMethods();
+  @override
+  void initState(){
+    super.initState();
+    checkFavorite();
+  }
+  Future<void> checkFavorite()async{
+    bool result=await db.isFavorite(widget.foodname);
+    setState(() {
+      isFavorite=result;
+    });
+  }
+  Future<void> toggleFavorite() async {
+    if (isFavorite) {
+      await db.removeFromFavorites(widget.foodname);
+    } else {
+      await db.addToFavorites(
+        foodName: widget.foodname,
+        image: widget.image,
+        recipe: widget.recipe,
+      );
+    }
+    setState(() {
+      isFavorite = !isFavorite;
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,6 +49,20 @@ class _RecipeState extends State<Recipe> {
                 width: MediaQuery.of(context).size.width,
                 height: 400,
                 fit: BoxFit.cover,
+              ),
+              Positioned(
+                top: 40,
+                right: 20,
+                child: CircleAvatar(
+                  backgroundColor: Colors.white70,
+                  child: IconButton(
+                    icon: Icon(
+                      isFavorite ? Icons.favorite : Icons.favorite_border,
+                      color: isFavorite ? Colors.red : Colors.grey,
+                    ),
+                    onPressed: toggleFavorite,
+                  )
+                ),
               ),
               Container(
                 padding: EdgeInsets.only(left:20.0,right: 20.0,top: 40.0),

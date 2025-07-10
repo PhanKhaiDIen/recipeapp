@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:recipe_app/pages/add_recipe.dart';
 import 'package:recipe_app/pages/category.dart';
 import 'package:recipe_app/pages/recipe.dart';
+import 'package:recipe_app/pages/user_screen.dart';
 import 'package:recipe_app/services/database.dart';
 import 'package:recipe_app/widget/support_widget.dart';
 
@@ -146,7 +147,11 @@ Widget allRecipe(){
                     ),
                   ),
                   Spacer(),
-                  ClipRRect(
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => UserScreen()));
+                },
+                  child:ClipRRect(
                       borderRadius: BorderRadius.circular(10),
                     child: avatarUrl != null
                         ? Image.network(
@@ -162,7 +167,7 @@ Widget allRecipe(){
                       fit: BoxFit.cover,
                     ),
                   )
-                ],
+              )],
               ),
             ),
             SizedBox(height: 20.0),
