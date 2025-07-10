@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:recipe_app/pages/faq.dart';
 import 'package:recipe_app/pages/favorite.dart';
 import 'Login_screen.dart';
 
@@ -131,7 +132,12 @@ class _UserScreenState extends State<UserScreen> {
               );
             }),
             const SizedBox(height: 10),
-            buildMenuItem("Câu hỏi thường gặp", () {}),
+            buildMenuItem("Câu hỏi thường gặp", () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => FAQChatScreen()),
+              );
+            }),
             const SizedBox(height: 10),
             buildMenuItem("Quyên góp từ thiện", () {}),
             const Spacer(),

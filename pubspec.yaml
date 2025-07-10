@@ -41,7 +41,13 @@ dependencies:
   random_string:
   fluttertoast:
   firebase_auth:
-
+  firebase_messaging:
+  flutter_local_notifications:
+  googleapis_auth:
+  http:
+  flutter_dotenv:
+  dart_jsonwebtoken:
+  rsa_pkcs:
 
 
 dev_dependencies:
@@ -69,6 +75,7 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
    - images/
+   - assets/credentials.json
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

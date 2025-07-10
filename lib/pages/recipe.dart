@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:recipe_app/services/database.dart';
+import 'package:recipe_app/services/local_noti.dart';
 import 'package:recipe_app/widget/support_widget.dart';
 class Recipe extends StatefulWidget {
   String image, foodname, recipe;
@@ -31,6 +32,10 @@ class _RecipeState extends State<Recipe> {
         foodName: widget.foodname,
         image: widget.image,
         recipe: widget.recipe,
+      );
+      LocalNoti.showNotification(
+          title: "Ayo bro vừa thêm công thức món yêu thích",
+          body: "Ông vừa yêu thích món ${widget.foodname}",
       );
     }
     setState(() {
