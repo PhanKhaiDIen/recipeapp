@@ -1,11 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:recipe_app/pages/add_recipe.dart';
 import 'package:recipe_app/pages/category.dart';
 import 'package:recipe_app/pages/recipe.dart';
-import 'package:recipe_app/pages/user_screen.dart';
 import 'package:recipe_app/services/database.dart';
 import 'package:recipe_app/widget/support_widget.dart';
 
@@ -18,26 +16,16 @@ class Home extends StatefulWidget{
 
 class _HomeState extends State<Home> {
    Stream? recipeStream;
-   String? avatarUrl;
+
   getontheload()async{
     recipeStream= await DatabaseMethods().getallRecipe();
     setState(() {});
   }
-   void loadAvatar() async {
-     final uid = FirebaseAuth.instance.currentUser?.uid;
-     if (uid != null) {
-       final url = await DatabaseMethods().getAvatarUrl(uid);
-       setState(() {
-         avatarUrl = url;
-       });
-     }
-   }
 
   @override
   void initState() {
     getontheload();
     super.initState();
-    loadAvatar();
   }
 
   bool search=false;
@@ -149,26 +137,14 @@ Widget allRecipe(){
                     ),
                   ),
                   Spacer(),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(context, MaterialPageRoute(builder: (_) =>UserScreen()));
-                    },
-                    child: ClipRRect(
+                  ClipRRect(
                       borderRadius: BorderRadius.circular(10),
-                      child: avatarUrl !=null
-                        ? Image.network(
-                        avatarUrl!,
-                        height: 70,
-                        width: 70,
-                        fit: BoxFit.cover,
+                      child:Image.asset(
+                          "images/obito.jpg",
+                          height: 70,
+                          width: 70,
+                          fit: BoxFit.cover
                       )
-                          :Image.asset(
-                        "images/obito.jpg",
-                        height: 70,
-                        width: 70,
-                        fit: BoxFit.cover,
-                      )
-                    ),
                   )
                 ],
               ),
@@ -340,7 +316,7 @@ Widget allRecipe(){
           ],
         ),
       ),
-    )])));
+    );
   }
   Widget buildResultCard(data){
     return  GestureDetector(
