@@ -1,12 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:recipe_app/pages/add_recipe.dart';
 import 'package:recipe_app/pages/category.dart';
-import 'package:recipe_app/pages/recipe.dart';
-import 'package:recipe_app/pages/user_screen.dart';
+import 'package:recipe_app/pages/recipe_screen.dart';
 import 'package:recipe_app/services/database.dart';
 import 'package:recipe_app/widget/support_widget.dart';
+import 'package:recipe_app/pages/user_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 
 class Home extends StatefulWidget{
   const Home({super.key});
@@ -16,21 +17,21 @@ class Home extends StatefulWidget{
 }
 
 class _HomeState extends State<Home> {
-   Stream? recipeStream;
-   String? avatarUrl;
+  Stream? recipeStream;
+  String? avatarUrl;
   getontheload()async{
     recipeStream= await DatabaseMethods().getallRecipe();
     setState(() {});
   }
-   void loadAvatar() async {
-     final uid = FirebaseAuth.instance.currentUser?.uid;
-     if (uid != null) {
-       final url = await DatabaseMethods().getAvatarUrl(uid);
-       setState(() {
-         avatarUrl = url;
-       });
-     }
-   }
+  void loadAvatar() async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid != null) {
+      final url = await DatabaseMethods().getAvatarUrl(uid);
+      setState(() {
+        avatarUrl = url;
+      });
+    }
+  }
   @override
   void initState() {
     getontheload();
@@ -78,25 +79,26 @@ class _HomeState extends State<Home> {
     }
   }
 
-Widget allRecipe(){
-  return StreamBuilder(stream: recipeStream, builder: (context,AsyncSnapshot snapshot){
-    return snapshot.hasData?
-        ListView.builder(
-            padding:EdgeInsets.zero,
-            itemCount:snapshot.data.docs.length,
-            scrollDirection:Axis.horizontal ,
-            itemBuilder: (context, index){
-              DocumentSnapshot ds=snapshot.data.docs[index];
-              return GestureDetector(
-                onTap: (){
-                  Navigator.push(context, MaterialPageRoute(builder: (context)=>Recipe(image: ds["Image"], foodname:ds["Name"], recipe: ds["Detail"])));
-                },
-                child: Container(
-                  margin: EdgeInsets.only(right: 20.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ClipRRect(
+
+  Widget allRecipe(){
+    return StreamBuilder(stream: recipeStream, builder: (context,AsyncSnapshot snapshot){
+      return snapshot.hasData?
+      ListView.builder(
+          padding:EdgeInsets.zero,
+          itemCount:snapshot.data.docs.length,
+          scrollDirection:Axis.horizontal ,
+          itemBuilder: (context, index){
+            DocumentSnapshot ds=snapshot.data.docs[index];
+            return GestureDetector(
+              onTap: (){
+                Navigator.push(context, MaterialPageRoute(builder: (context)=>Recipe(image: ds["Image"], foodname:ds["Name"], recipe: ds["Detail"])));
+              },
+              child: Container(
+                margin: EdgeInsets.only(right: 20.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ClipRRect(
                         borderRadius:BorderRadius.circular(10),
                         child:Image.network(
                           ds["Image"],
@@ -104,22 +106,22 @@ Widget allRecipe(){
                           width: 250,
                           fit: BoxFit.cover,
                         )),
-                      SizedBox(
-                        height: 10.0,
-                      ),
-                      Text(
-                        ds["Name"],
-                        style: AppWidget.boldfeildtextstyle(),
-                      )
-                    ],
-                  ),
+                    SizedBox(
+                      height: 10.0,
+                    ),
+                    Text(
+                      ds["Name"],
+                      style: AppWidget.boldfeildtextstyle(),
+                    )
+                  ],
                 ),
-              );
-            })
-        :Container();
+              ),
+            );
+          })
+          :Container();
+    }
+    );
   }
-  );
-}
 
   @override
   Widget build (BuildContext context){
@@ -147,27 +149,21 @@ Widget allRecipe(){
                     ),
                   ),
                   Spacer(),
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (_) => UserScreen()));
-                },
-                  child:ClipRRect(
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (_) => UserScreen()));
+                    },
+                    child: ClipRRect(
                       borderRadius: BorderRadius.circular(10),
-                    child: avatarUrl != null
-                        ? Image.network(
-                      avatarUrl!,
-                      height: 70,
-                      width: 70,
-                      fit: BoxFit.cover,
-                    )
-                        : Image.asset(
-                      "images/obito.jpg",
-                      height: 70,
-                      width: 70,
-                      fit: BoxFit.cover,
+                      child: Image.asset(
+                        "images/obito.jpg",
+                        height: 70,
+                        width: 70,
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   )
-              )],
+                ],
               ),
             ),
             SizedBox(height: 20.0),
@@ -181,163 +177,167 @@ Widget allRecipe(){
                   initiateSearch(value.toUpperCase());
                 },
                 decoration: InputDecoration(
-                    border: InputBorder.none,
-                    suffixIcon: Icon(
-                        Icons.search_outlined),
-                        hintText:"Search Recipe...",
+                  border: InputBorder.none,
+                  suffixIcon: Icon(
+                      Icons.search_outlined),
+                  hintText:"Search Recipe...",
                 ),
               ),
             ),
             SizedBox(height: 20.0,),
             search? ListView(
-              padding: EdgeInsets.only(left: 10.0,right: 10.0),
-              primary: false,
-              shrinkWrap: true,
-              children: tempSearchStore.map((element){
-                return buildResultCard(element);
-              }).toList()
+                padding: EdgeInsets.only(left: 10.0,right: 10.0),
+                primary: false,
+                shrinkWrap: true,
+                children: tempSearchStore.map((element){
+                  return buildResultCard(element);
+                }).toList()
             )
-            :Container(
-                  height: 200,
-                  width: MediaQuery.of(context).size.width,
-                  child: Expanded(
-                    child:ListView(
-                      scrollDirection: Axis.horizontal,
-                      children: [
-                        GestureDetector(
-                          onTap: (){
-                            Navigator.push(context,MaterialPageRoute(builder: (context)=> CategoryRecipe(category: "Main Dishes Recipes")));
-                          },
-                          child: Container(
-                            margin: EdgeInsets.only(right: 20.0),
-                            child: Column(
-                              children: [
-                                ClipRRect(
-                                  borderRadius:BorderRadius.circular(10),
-                                  child: Image.asset(
-                                    "images/MainDishes.jpg",
-                                    height: 150,
-                                    width: 150,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                                SizedBox(height: 10.0,),
-                                Text("Main DishesDishes Recipes",
-                                    style: AppWidget.lightfeildtextstyle()
-                                )
-                              ],
+                :Container(
+              height: 200,
+              width: MediaQuery.of(context).size.width,
+              child: Expanded(
+                child:ListView(
+                  scrollDirection: Axis.horizontal,
+                  children: [
+                    GestureDetector(
+                      onTap: (){
+                        Navigator.push(context,MaterialPageRoute(builder: (context)=> CategoryRecipe(category: "Main Dishes Recipes")));
+                      },
+                      child: Container(
+                        margin: EdgeInsets.only(right: 20.0),
+                        child: Column(
+                          children: [
+                            ClipRRect(
+                              borderRadius:BorderRadius.circular(10),
+                              child: Image.asset(
+                                "images/MainDishes.jpg",
+                                height: 150,
+                                width: 150,
+                                fit: BoxFit.cover,
+                              ),
                             ),
-                          ),
+                            SizedBox(height: 10.0,),
+                            Text("Main Dishes Recipes",
+                                style: AppWidget.lightfeildtextstyle()
+                            )
+                          ],
                         ),
-                        GestureDetector(
-                          onTap: (){
-                            Navigator.push(context,MaterialPageRoute(builder: (context)=> CategoryRecipe(category: "Dessert Recipes")));
-                          },
-                          child: Container(
-                            margin: EdgeInsets.only(right: 20.0),
-                            child: Column(
-                              children: [
-                                ClipRRect(
-                                  borderRadius:BorderRadius.circular(10),
-                                  child: Image.asset(
-                                    "images/Dessert.jpg",
-                                    height: 150,
-                                    width: 150,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                                SizedBox(height: 10.0,),
-                                Text("Dessert Recipes",
-                                    style: AppWidget.lightfeildtextstyle()
-                                )
-                              ],
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: (){
+                        Navigator.push(context,MaterialPageRoute(builder: (context)=> CategoryRecipe(category: "Dessert Recipes")));
+                      },
+                      child: Container(
+                        margin: EdgeInsets.only(right: 20.0),
+                        child: Column(
+                          children: [
+                            ClipRRect(
+                              borderRadius:BorderRadius.circular(10),
+                              child: Image.asset(
+                                "images/Dessert.jpg",
+                                height: 150,
+                                width: 150,
+                                fit: BoxFit.cover,
+                              ),
                             ),
-                          ),
+                            SizedBox(height: 10.0,),
+                            Text("Dessert Recipes",
+                                style: AppWidget.lightfeildtextstyle()
+                            )
+                          ],
                         ),
-                       GestureDetector(
-                          onTap: (){
-                            Navigator.push(context,MaterialPageRoute(builder: (context)=> CategoryRecipe(category: "Noodles & Soup Recipes")));
-                          },
-                          child: Container(
-                            margin: EdgeInsets.only(right: 20.0),
-                            child: Column(
-                              children: [
-                                ClipRRect(
-                                  borderRadius:BorderRadius.circular(10),
-                                  child: Image.asset(
-                                    "images/Soup.jpg",
-                                    height: 150,
-                                    width: 150,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                                SizedBox(height: 10.0,),
-                                Text("Noodles & Soup Recipes",
-                                    style: AppWidget.lightfeildtextstyle()
-                                )
-                              ],
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: (){
+                        Navigator.push(context,MaterialPageRoute(builder: (context)=> CategoryRecipe(category: "Noodles & Soup Recipes")));
+                      },
+                      child: Container(
+                        margin: EdgeInsets.only(right: 20.0),
+                        child: Column(
+                          children: [
+                            ClipRRect(
+                              borderRadius:BorderRadius.circular(10),
+                              child: Image.asset(
+                                "images/Soup.jpg",
+                                height: 150,
+                                width: 150,
+                                fit: BoxFit.cover,
+                              ),
                             ),
-                          ),
+                            SizedBox(height: 10.0,),
+                            Text("Noodles & Soup Recipes",
+                                style: AppWidget.lightfeildtextstyle()
+                            )
+                          ],
                         ),
-                        GestureDetector(
-                          onTap: (){
-                            Navigator.push(context,MaterialPageRoute(builder: (context)=> CategoryRecipe(category: "Vegetables Recipes")));
-                          },
-                          child: Container(
-                            margin: EdgeInsets.only(right: 20.0),
-                            child: Column(
-                              children: [
-                                ClipRRect(
-                                  borderRadius:BorderRadius.circular(10),
-                                  child: Image.asset(
-                                    "images/Vegetable.jpg",
-                                    height: 150,
-                                    width: 150,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                                SizedBox(height: 10.0,),
-                                Text("Vegetables Recipes",
-                                    style: AppWidget.lightfeildtextstyle()
-                                )
-                              ],
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: (){
+                        Navigator.push(context,MaterialPageRoute(builder: (context)=> CategoryRecipe(category: "Vegetable Recipes")));
+                      },
+                      child: Container(
+                        margin: EdgeInsets.only(right: 20.0),
+                        child: Column(
+                          children: [
+                            ClipRRect(
+                              borderRadius:BorderRadius.circular(10),
+                              child: Image.asset(
+                                "images/Vegetable.jpg",
+                                height: 150,
+                                width: 150,
+                                fit: BoxFit.cover,
+                              ),
                             ),
-                          ),
+                            SizedBox(height: 10.0,),
+                            Text("Vegetable Recipes",
+                                style: AppWidget.lightfeildtextstyle()
+                            )
+                          ],
                         ),
-                        GestureDetector(
-                          onTap: (){
-                            Navigator.push(context,MaterialPageRoute(builder: (context)=> CategoryRecipe(category: "Drinks Recipes")));
-                          },
-                          child: Container(
-                            margin: EdgeInsets.only(right: 20.0),
-                            child: Column(
-                              children: [
-                                ClipRRect(
-                                  borderRadius:BorderRadius.circular(10),
-                                  child: Image.asset(
-                                    "images/Drinks.jpg",
-                                    height: 150,
-                                    width: 150,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                                SizedBox(height: 10.0,),
-                                Text("Drinks Recipes",
-                                    style: AppWidget.lightfeildtextstyle()
-                                )
-                              ],
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: (){
+                        Navigator.push(context,MaterialPageRoute(builder: (context)=> CategoryRecipe(category: "Drinks Recipes")));
+                      },
+                      child: Container(
+                        margin: EdgeInsets.only(right: 20.0),
+                        child: Column(
+                          children: [
+                            ClipRRect(
+                              borderRadius:BorderRadius.circular(10),
+                              child: Image.asset(
+                                "images/Drinks.jpg",
+                                height: 150,
+                                width: 150,
+                                fit: BoxFit.cover,
+                              ),
                             ),
-                          ),
+                            SizedBox(height: 10.0,),
+                            Text("Drinks Recipes",
+                                style: AppWidget.lightfeildtextstyle()
+                            )
+                          ],
                         ),
-                SizedBox(height: 20.0,
+                      ),
+                    ),
+                  ],
                 ),
+              ),
+            ),
+            SizedBox(height: 20.0,
+            ),
             search? Container(): Expanded(child: allRecipe()),
 
 
           ],
         ),
       ),
-    )])));
+    );
   }
   Widget buildResultCard(data){
     return  GestureDetector(
